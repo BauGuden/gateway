@@ -1,0 +1,36 @@
+import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
+
+@Catch(RpcException)
+export class GlobalRpcExceptionFilter implements ExceptionFilter {
+    catch(exception: RpcException, host: ArgumentsHost) {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse();
+
+        const rpcError = exception.getError();
+
+        if (rpcError.toString().includes('Empty repsonse')) {
+            return response.status(500).json({
+                status: 500,
+                message: rpcError.toString().slice(0, rpcError.toString().indexOf('(') - 1)
+            })
+        }
+
+        if(
+            typeof rpcError === 'object' &&
+            'status' in rpcError &&
+            'message' in rpcError
+        ) {
+            const status = isNaN(Number(rpcError.status)) ? 400 : Number(rpcError.status);
+            return response.status(status).json({
+                status: status,
+                message: rpcError.message
+            })
+        }
+        response.status(400).json({
+            status: 400,
+            message: rpcError.toString()
+        })
+    }
+}
+
