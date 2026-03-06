@@ -13,7 +13,7 @@ async function main() {
   app.setGlobalPrefix('api');
 
   app.useGlobalFilters(new GlobalRpcExceptionFilter());
-
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -15,7 +15,7 @@ export class AuthController {
 
   @Post('register')
   register(@Body() registerUserDto: RegisterUserDto) {
-    return this.client.send('register', registerUserDto).
+    return this.client.send('auth.register', registerUserDto).
       pipe(
         catchError(err => {
           throw new RpcException(err);
@@ -25,7 +25,7 @@ export class AuthController {
 
   @Post('login')
   login(@Body() loginUserDto: LoginUserDto) {
-    return this.client.send('login', loginUserDto).
+    return this.client.send('auth.login', loginUserDto).
       pipe(
         catchError(err => {
           throw new RpcException(err);
@@ -35,7 +35,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('verify')
-  verifying(@User() user: any) {
+  verifying(@User() user: { id: string, email: string, name: string }) {
     return { user };
   }
 }
